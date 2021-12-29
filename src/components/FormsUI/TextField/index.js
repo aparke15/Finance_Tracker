@@ -12,7 +12,7 @@ const TextFieldWrapper = ({ name, ...props }) => {
 
   if (meta && meta.touched && meta.error) {
     configureTextField.error = true;
-    configureTextField.helperText = meta.error;
+    configureTextField.helpertext = meta.error;
   }
 
   return <OutlinedInput {...configureTextField} />;

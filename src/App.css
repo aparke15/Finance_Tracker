@@ -149,3 +149,9 @@ input[type="number"] {
 .list li:hover .delete-btn {
   opacity: 1;
 }
+
+.err {
+  font-size: x-small;
+  color: red;
+  text-align: right;
+}

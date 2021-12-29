@@ -18,7 +18,27 @@ export const AppReducer = (state, action) => {
         ...state,
         transactions: [...state.transactions, action.payload],
       };
+    case "GET_USER":
+      return {
+        ...state,
+        user: action.payload,
+      };
+    case "GET_USERS":
+      return {
+        ...state,
+        users: action.payload,
+      };
+    case "ADD_USER":
+      return {
+        ...state,
+        users: [...state.users, action.payload],
+      };
     case "TRANSACTION_ERROR":
+      return {
+        ...state,
+        error: action.payload,
+      };
+    case "USER_ERROR":
       return {
         ...state,
         error: action.payload,

@@ -10,13 +10,14 @@ import {
   VisibilityOffOutlined,
   VisibilityOutlined,
 } from "@mui/icons-material";
-import React, { useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { Field, Form, Formik } from "formik";
 import { Link, Route, Routes } from "react-router-dom";
 import { Login } from "./Login";
 import TextField from "./FormsUI/TextField";
 import * as yup from "yup";
 import YupPassword from "yup-password";
+import { GlobalContext } from "../context/GlobalState";
 
 YupPassword(yup);
 
@@ -35,10 +36,28 @@ const validationSchema = yup.object().shape({
 });
 
 export const Register = () => {
+  const { user, users, addUser, getUser, getAllUsers } =
+    useContext(GlobalContext);
+
+  const [email, setEmail] = useState("");
+  const emailList = users.map((user) => user.email);
+
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  useEffect(() => {
+    getAllUsers();
+  }, []);
+
   // const onSubmit = (e) => {};
+  const handleSubmit = () => {
+    const newUser = {
+      email,
+      password,
+    };
+    addUser(newUser);
+  };
 
   return (
     <>
@@ -52,6 +71,7 @@ export const Register = () => {
         onSubmit={(data, { setSubmitting, resetForm }) => {
           setSubmitting(true);
           // make calls to b/e
+          handleSubmit();
           setSubmitting(false);
           resetForm();
         }}
@@ -59,7 +79,19 @@ export const Register = () => {
         {({ values, errors, isSubmitting }) => (
           <Form>
             <InputLabel htmlFor="email">Email</InputLabel>
-            <TextField name="email" type="input" placeholder="Enter email" />
+            <TextField
+              name="email"
+              type="input"
+              placeholder="Enter email"
+              onChange={(e) => {
+                setEmail(e.target.value);
+                values.email = e.target.value;
+                if (emailList.includes(e.target.value)) {
+                  errors.email = "Email already in use";
+                }
+              }}
+            />
+            {errors.email ? <div className="err">{errors.email}</div> : null}
 
             <InputLabel htmlFor="password">Password</InputLabel>
             <TextField
@@ -67,6 +99,10 @@ export const Register = () => {
               type={showPassword ? "input" : "password"}
               placeholder="Enter Password"
               style={{ marginBottom: "20px" }}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                values.password = e.target.value;
+              }}
               endAdornment={
                 <InputAdornment position="end">
                   <IconButton
@@ -84,6 +120,9 @@ export const Register = () => {
                 </InputAdornment>
               }
             />
+            {errors.password ? (
+              <div className="err">{errors.password}</div>
+            ) : null}
 
             <InputLabel htmlFor="confirmPassword">Re-type Password</InputLabel>
             <TextField
@@ -108,11 +147,15 @@ export const Register = () => {
                 </InputAdornment>
               }
             />
+            {errors.confirmPassword ? (
+              <div className="err">{errors.confirmPassword}</div>
+            ) : null}
+
             <Button disabled={isSubmitting} type="submit" className="btn">
               Sign Up
             </Button>
-            <pre>{JSON.stringify(values, null, 2)}</pre>
-            <pre>{JSON.stringify(errors, null, 2)}</pre>
+            {/* <pre>{JSON.stringify(values, null, 2)}</pre>
+            <pre>{JSON.stringify(errors, null, 2)}</pre> */}
           </Form>
         )}
       </Formik>
