@@ -12,4 +12,6 @@ usersRouter.route("/register").post(registerUser);
 
 usersRouter.route("/:email").get(getUserByEmail);
 
+usersRouter.route("/login").get();
+
 module.exports = usersRouter;
