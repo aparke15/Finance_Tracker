@@ -29,14 +29,15 @@ const initial_form_state = {
 
 const validationSchema = yup.object().shape({
   email: yup.string().email().required("Enter a valid email"),
-  password: yup.string().password().required(),
-  confirmPassword: yup
-    .string()
-    .oneOf([yup.ref("password"), null], "Passwords do not match"),
+  // password: yup.string().password().required(),
+  password: yup.string().required(),
+  // confirmPassword: yup
+  // .string()
+  // .oneOf([yup.ref("password"), null], "Passwords do not match"),
 });
 
 export const Register = () => {
-  const { user, users, addUser, getUser, getAllUsers } =
+  const { user, users, addUser, getUser, getAllUsers, login, isLoggedIn } =
     useContext(GlobalContext);
 
   const [email, setEmail] = useState("");
@@ -51,12 +52,19 @@ export const Register = () => {
   }, []);
 
   // const onSubmit = (e) => {};
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const newUser = {
       email,
       password,
     };
-    addUser(newUser);
+    await addUser(newUser);
+    if (localStorage.getItem("token")) localStorage.removeItem("token");
+    const jwtToken = await login(newUser);
+    localStorage.setItem("token", jwtToken);
+    if (localStorage.getItem("currentUser"))
+      localStorage.removeItem("currentUser");
+    const loggedInUser = await getUser(newUser);
+    localStorage.setItem("currentUser", loggedInUser);
   };
 
   return (
@@ -68,12 +76,12 @@ export const Register = () => {
           ...initial_form_state,
         }}
         validationSchema={validationSchema}
-        onSubmit={(data, { setSubmitting, resetForm }) => {
+        onSubmit={async (data, { setSubmitting, resetForm }) => {
           setSubmitting(true);
           // make calls to b/e
-          handleSubmit();
+          await handleSubmit();
           setSubmitting(false);
-          resetForm();
+          window.location.reload(false);
         }}
       >
         {({ values, errors, isSubmitting }) => (
@@ -88,6 +96,8 @@ export const Register = () => {
                 values.email = e.target.value;
                 if (emailList.includes(e.target.value)) {
                   errors.email = "Email already in use";
+                } else if (errors.email === "Email already in use") {
+                  delete errors.email;
                 }
               }}
             />

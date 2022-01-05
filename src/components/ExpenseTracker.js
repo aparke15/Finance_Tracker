@@ -3,6 +3,7 @@ import { Balance } from "./Balance";
 import { IncomeExpenses } from "./IncomeExpenses";
 import { TransactionList } from "./TransactionList";
 import { AddTransaction } from "./AddTransaction";
+import { Logout } from "./Logout";
 
 export const ExpenseTracker = () => {
   return (
@@ -11,6 +12,7 @@ export const ExpenseTracker = () => {
       <IncomeExpenses />
       <TransactionList />
       <AddTransaction />
+      <Logout />
     </div>
   );
 };

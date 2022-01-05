@@ -8,6 +8,8 @@ const API = process.env.REACT_APP_API;
 const initialState = {
   user: null,
   currentUser: null,
+  token: null,
+  isLoggedIn: false,
   users: [],
   transactions: [],
   error: null,
@@ -29,19 +31,58 @@ export const GlobalProvider = ({ children }) => {
       },
     };
     try {
-      console.log(creds);
       const res = await axios.get(`${API}/api/v1/users/${creds.email}`);
-      console.log(res.data);
+      console.log("creds.email", creds.email);
       dispatch({
         type: "GET_USER",
         payload: res.data.data,
       });
+      console.log(res.data.data[0]);
+      return res.data.data[0].email;
     } catch (error) {
       dispatch({
         type: "USER_ERROR",
         payload: error.response.data.error,
       });
     }
+  };
+
+  const setIsLoggedIn = async () => {
+    state.isLoggedIn = true;
+  };
+
+  const login = async (credentials) => {
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    try {
+      const res = await axios.post(
+        `${API}/api/v1/users/login`,
+        credentials,
+        config
+      );
+      dispatch({
+        type: "LOG_IN",
+        payload: res.data.data,
+      });
+      return res.data.access_token;
+    } catch (error) {
+      dispatch({
+        type: "USER_ERROR",
+        payload: error.response.data.error,
+      });
+    }
+  };
+
+  const logout = async () => {
+    try {
+      dispatch({
+        type: "LOG_OUT",
+        payload: null,
+      });
+    } catch (error) {}
   };
 
   const getAllUsers = async () => {
@@ -121,6 +162,7 @@ export const GlobalProvider = ({ children }) => {
       },
     };
     try {
+      console.log(user);
       const res = await axios.post(
         `${API}/api/v1/users/register`,
         user,
@@ -138,36 +180,26 @@ export const GlobalProvider = ({ children }) => {
     }
   };
 
-  const login = async (credentials) => {
-    const config = {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    };
-    try {
-      const res = await axios.post(`${API}/api/vi/login`, credentials, config);
-      dispatch({
-        type: "LOG_IN",
-        payload: res.data,
-      });
-    } catch (error) {}
-  };
-
   return (
     <GlobalContext.Provider
       value={{
         user: state.user,
         currentUser: state.currentUser,
+        isLoggedIn: state.isLoggedIn,
         users: state.users,
         transactions: state.transactions,
         error: state.error,
         loading: state.loading,
+        token: state.token,
         getTransactions,
         deleteTransaction,
         addTransaction,
         addUser,
         getUser,
         getAllUsers,
+        login,
+        logout,
+        setIsLoggedIn,
       }}
     >
       {children}

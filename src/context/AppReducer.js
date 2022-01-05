@@ -19,6 +19,7 @@ export const AppReducer = (state, action) => {
         transactions: [...state.transactions, action.payload],
       };
     case "GET_USER":
+      console.log(state.user);
       return {
         ...state,
         user: action.payload,
@@ -46,12 +47,16 @@ export const AppReducer = (state, action) => {
     case "LOG_IN":
       return {
         ...state,
+        isLoggedIn: true,
         user: action.payload,
+        currentUser: action.payload,
       };
     case "LOG_OUT":
       return {
         ...state,
+        isLoggedIn: false,
         user: null,
+        currentUser: null,
       };
     default:
       return state;
